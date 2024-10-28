@@ -87,6 +87,7 @@ jobs:
         run: |
           pwd
           cd ${{ env.GIT_OPS_NAME }}
+          cd backend
           #kustomize edit set image ${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}
           sed -i 's|image:.*|image: '"${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}"'|' backend.yaml
           cat backend.yaml

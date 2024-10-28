@@ -87,7 +87,7 @@ jobs:
         run: |
           pwd
           cd ${{ env.GIT_OPS_NAME }}
-          cd backend
+          #cd backend
           #kustomize edit set image ${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}
           sed -i 's|image:.*|image: '"${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}"'|' backend.yaml
           cat backend.yaml
@@ -98,7 +98,7 @@ jobs:
       - name: Commit manifest files
         run: |
           cd ${{ env.GIT_OPS_NAME }}
-          cd backend
+          #cd backend
           git checkout HEAD
           git config --global user.email "world.kim@kt.com"
           git config --global user.name "world.kim"

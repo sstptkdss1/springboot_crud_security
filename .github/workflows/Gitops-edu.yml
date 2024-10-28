@@ -1,0 +1,105 @@
+name: Deploy Azure with Gitops-Kustomize
+
+on:      
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Docker TAG"
+        required: true
+        default: "main" #master
+
+env:
+  GIT_OPS_NAME: world-ops02
+  #OPS_DIR: ${{ github.event.repository.name }} #charts/
+  #WHATAP_HOST: 10.241.10.36/10.241.10.37
+  
+jobs:
+  ecr-build-push-and-deploy:
+    name: azr-build-push-and-deploy
+    runs-on: ubuntu-latest
+    #runs-on: self-hosted
+    environment: production
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      
+      - name: Log in to Docker Hub
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.AZURE_URL }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      
+      - name: Set Timezone
+        uses: zcong1993/setup-timezone@master
+        with:
+          # Desired timezone for Linux
+          timezoneLinux: Asia/Seoul
+        
+      - name: set env  # TAG 를 현재 시간으로 설정
+        run: echo "NOW=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+      
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ github.repository }}
+          tags: ${{ env.NOW }} # ${{ github.event.inputs.name }}
+  
+      - name: Build and Push to ACR
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          file: ./Dockerfile
+          platforms: linux/amd64
+          build-args: |
+            WHATAP_HOST: ${{ secrets.WHATAP_HOST }}
+          tags: ${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}
+
+      # - name: Run Trivy vulnerability scanner
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     image-ref: "${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}"
+      #     format: "table"
+      #     exit-code: "0"
+      #     ignore-unfixed: true
+      #     vuln-type: "os,library"
+      #     severity: "CRITICAL,HIGH"
+        
+      # # kustomize 명령을 가져온다.
+      # - name: Setup Kustomize
+      #   uses: imranismail/setup-kustomize@v1
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          # 설정정보 저장소
+          repository: ${{ github.repository_owner }}/${{ env.GIT_OPS_NAME }}
+          ref: main #master
+          # 다른 저장소에 push 하려면 Personal Access Token이 필요.
+          token: ${{ secrets.ACTION_TOKEN }} # ${{ secrets.GITHUB_TOKEN }} 
+          path: ${{ env.GIT_OPS_NAME }}
+        
+      # 새 이미지 버전으로 파일 수정
+      - name: Update Kubernetes resources
+        run: |
+          pwd
+          cd ${{ env.GIT_OPS_NAME }}
+          #kustomize edit set image ${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}
+          sed -i 's|image:.*|image: '"${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}"'|' backend.yaml
+          cat backend.yaml
+        
+    # kustomize edit set image ${{ github.repository }}=${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}
+   
+      # 수정된 파일 commit & push
+      - name: Commit manifest files
+        run: |
+          cd ${{ env.GIT_OPS_NAME }}
+          git checkout HEAD
+          git config --global user.email "world.kim@kt.com"
+          git config --global user.name "world.kim"
+          git commit -am 'update image tag ${{ env.NOW }} from Github Action'
+          cat backend.yaml
+          git push origin HEAD

@@ -98,6 +98,7 @@ jobs:
       - name: Commit manifest files
         run: |
           cd ${{ env.GIT_OPS_NAME }}
+          cd backend
           git checkout HEAD
           git config --global user.email "world.kim@kt.com"
           git config --global user.name "world.kim"

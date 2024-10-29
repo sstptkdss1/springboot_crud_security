@@ -22,18 +22,18 @@ spring:
 #      client:
 #        url: http://localhost:8080
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    prometheus:
-      enabled: true
-  metrics:
-    export:
-      prometheus:
-        enabled: true
+# management:
+#   endpoints:
+#     web:
+#       exposure:
+#         include: "*"
+#   endpoint:
+#     prometheus:
+#       enabled: true
+#   metrics:
+#     export:
+#       prometheus:
+#         enabled: true
 
 # logging
 logging:

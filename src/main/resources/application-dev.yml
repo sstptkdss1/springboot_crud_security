@@ -2,7 +2,7 @@
 ### dev
 ##############
 server:
-  port: 8080
+  port: 8200 #8080
   servlet:
     context-path: /
   tomcat:

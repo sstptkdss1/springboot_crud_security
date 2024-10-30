@@ -44,9 +44,9 @@ COPY --from=MAVEN_BUILD /build/target/*.jar app.jar
 ENV SPRING_PROFILES_ACTIVE dev
 
 ### Azure Opentelemetry ###
-#COPY agent/applicationinsights-agent-3.5.4.jar applicationinsights-agent-3.5.4.jar 
-#COPY agent/applicationinsights.json applicationinsights.json
-#ENV APPLICATIONINSIGHTS_CONNECTION_STRING="InstrumentationKey=02a052e7-48b4-408a-ad85-9dfcefed3b77;IngestionEndpoint=https://koreacentral-0.in.applicationinsights.azure.com/;LiveEndpoint=https://koreacentral.livediagnostics.monitor.azure.com/;ApplicationId=56ac42e7-29ef-47d4-b061-d0715aa7deda"
+COPY agent/applicationinsights-agent-3.5.4.jar applicationinsights-agent-3.5.4.jar 
+COPY agent/applicationinsights.json applicationinsights.json
+ENV APPLICATIONINSIGHTS_CONNECTION_STRING="InstrumentationKey=02a052e7-48b4-408a-ad85-9dfcefed3b77;IngestionEndpoint=https://koreacentral-0.in.applicationinsights.azure.com/;LiveEndpoint=https://koreacentral.livediagnostics.monitor.azure.com/;ApplicationId=56ac42e7-29ef-47d4-b061-d0715aa7deda"
 ### Azure Opentelemetry ###
 
 ENV TZ Asia/Seoul
@@ -58,12 +58,12 @@ ENV JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 ENV JAVA_OPTS="${JAVA_OPTS} -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -XX:G1ConcRefinementThreads=20"
 
 ### Azure Opentelemerty ###
-#ENV JAVA_OPTS="${JAVA_OPTS} -javaagent:applicationinsights-agent-3.5.4.jar"
+ENV JAVA_OPTS="${JAVA_OPTS} -javaagent:applicationinsights-agent-3.5.4.jar"
 ### Azure Opentelemerty ###
 
 
 EXPOSE 8080
 
 #ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar  app.jar "]
-ENTRYPOINT ["sh", "-c", "java -jar  app.jar "]
-#ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar"]
+#ENTRYPOINT ["sh", "-c", "java -jar  app.jar "]
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar"]

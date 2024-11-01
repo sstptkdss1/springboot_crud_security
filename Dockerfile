@@ -49,8 +49,11 @@ COPY agent/applicationinsights.json applicationinsights.json
 ENV APPLICATIONINSIGHTS_CONNECTION_STRING="InstrumentationKey=02a052e7-48b4-408a-ad85-9dfcefed3b77;IngestionEndpoint=https://koreacentral-0.in.applicationinsights.azure.com/;LiveEndpoint=https://koreacentral.livediagnostics.monitor.azure.com/;ApplicationId=56ac42e7-29ef-47d4-b061-d0715aa7deda"
 ### Azure Opentelemetry ###
 
+LABEL owner=vivaldi-project-team
 ENV TZ Asia/Seoul
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# ENV TZ Asia/Seoul
+# RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ENV SPRING_PROFILES_ACTIVE dev
 

@@ -179,6 +179,14 @@
 		    <artifactId>elastic-apm-agent</artifactId>
 		    <version>1.43.0</version>
 		</dependency>	
+		
+		<!--azure-->
+		<dependency>
+		    <groupId>com.azure.spring</groupId>
+		    <artifactId>spring-cloud-azure-starter-monitor</artifactId>
+		    <version>1.0.0-beta.6</version>
+		</dependency>
+			
 	</dependencies>
 
 	<build>
